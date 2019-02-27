@@ -46,11 +46,11 @@ def carousel(left, right, x):
 
 
 shortcut = [
-    ["j", "Down      ", "下移"],
-    ["k", "Up        ", "上移"],
-    ["h", "Back      ", "后退"],
-    ["l", "Forward   ", "前进"],
-    ["u", "Prev page ", "上一页"],
+    ["s", "Down      ", "下移"],
+    ["w", "Up        ", "上移"],
+    ["<", "Back      ", "后退"],
+    [">", "Forward   ", "前进"],
+    ["a", "Prev page ", "上一页"],
     ["d", "Next page ", "下一页"],
     ["f", "Search    ", "快速搜索"],
     ["[", "Prev song ", "上一曲"],
@@ -60,23 +60,25 @@ shortcut = [
     ["=", "Volume+          ", "音量增加"],
     ["-", "Volume-          ", "音量减少"],
     ["m", "Menu             ", "主菜单"],
-    ["p", "Present/History  ", "当前/历史播放列表"],
-    ["i", "Music Info       ", "当前音乐信息"],
-    ["Shift+p", "Playing Mode     ", "播放模式切换"],
-    ["Shift+a", "Enter album      ", "进入专辑"],
-    ["a", "Add              ", "添加曲目到打碟"],
-    ["z", "DJ list          ", "打碟列表（退出后清空）"],
-    ["s", "Star      ", "添加到本地收藏"],
-    ["c", "Collection", "本地收藏列表"],
+    ["l", "Present/History  ", "当前/历史播放列表"],
+    ["(", "To the first     ", "跳至首项"],
+    [")", "To the end       ", "跳至尾项"],
+    ["Shift+i", "Music Info       ", "当前音乐信息"],
+    ["Shift+m", "Playing Mode     ", "播放模式切换"],
+    ["^", "Enter album      ", "进入专辑"],
+    ["&", "Star      ", "添加到本地收藏"],
+    ["Shift+l", "Collection", "本地收藏列表"],
     ["r", "Remove    ", "删除当前条目"],
-    ["Shift+j", "Move Down ", "向下移动当前条目"],
-    ["Shift+k", "Move Up   ", "向上移动当前条目"],
-    [",", "Like      ", "喜爱"],
-    ["Shfit+c", "Cache     ", "缓存歌曲到本地"],
-    [".", "Trash FM  ", "删除 FM"],
-    ["/", "Next FM   ", "下一 FM"],
-    ["q", "Quit      ", "退出"],
-    ["w", "Quit&Clear", "退出并清除用户信息"],
+    ["Shift+s", "Move Down ", "向下移动当前条目"],
+    ["Shift+w", "Move Up   ", "向上移动当前条目"],
+    ["*", "Like      ", "喜爱"],
+    ["Shfit+d", "Cache     ", "缓存歌曲到本地"],
+    ["Shfit+r", "Trash FM  ", "删除 FM"],
+    ["}", "Next FM   ", "下一 FM"],
+    ["Shfit+q", "Quit      ", "退出"],
+    ["t", "Timing Exit      ", "定时退出"],
+    ["!", "Quit&Clear       ", "退出并清除用户信息"]
+
 ]
 
 
@@ -281,19 +283,19 @@ class Menu(object):
 
             if self.is_in_countdown:
                 if time.time() - self.countdown_start > self.countdown:
-                    key = ord("q")
+                    key = ord("Q")
 
             # 退出
-            if key == ord("q"):
+            if key == ord("Q"):
                 break
 
             # 退出并清除用户信息
-            if key == ord("w"):
+            if key == ord("!"):
                 self.api.logout()
                 break
 
             # 上移
-            elif key == ord("k"):
+            elif key == ord("w"):
                 # turn page if at beginning
                 if idx == offset:
                     if offset == 0:
@@ -308,7 +310,7 @@ class Menu(object):
                 self.menu_starts = time.time()
 
             # 下移
-            elif key == ord("j"):
+            elif key == ord("s"):
                 # turn page if at end
                 if idx == min(len(datalist), offset + step) - 1:
                     if offset + step >= len(datalist):
@@ -340,7 +342,7 @@ class Menu(object):
                 self.offset = 0
 
             # 向上翻页
-            elif key == ord("u"):
+            elif key == ord("a"):
                 if offset == 0:
                     continue
                 self.menu_starts = time.time()
@@ -360,7 +362,7 @@ class Menu(object):
                 self.index = (self.index + step) // step * step
 
             # 前进
-            elif key == ord("l") or key == 10:
+            elif key == ord(">") or key == 10:
                 self.enter_flag = True
                 if len(self.datalist) <= 0:
                     continue
@@ -372,7 +374,7 @@ class Menu(object):
                     self.offset = 0
 
             # 回退
-            elif key == ord("h"):
+            elif key == ord("<"):
                 # if not main menu
                 if len(self.stack) == 1:
                     continue
@@ -413,7 +415,7 @@ class Menu(object):
                 self.player.shuffle()
 
             # 喜爱
-            elif key == ord(","):
+            elif key == ord("*"):
                 return_data = self.request_api(self.api.fm_like, self.player.playing_id)
                 if return_data:
                     song_name = self.player.playing_name
@@ -422,7 +424,7 @@ class Menu(object):
                     notify("Adding song failed!", 0)
 
             # 删除FM
-            elif key == ord("."):
+            elif key == ord("R"):
                 if self.datatype == "fmsongs":
                     if len(self.player.info["player_list"]) == 0:
                         continue
@@ -434,7 +436,7 @@ class Menu(object):
                         notify("Deleted successfully!", 0)
 
             # 下一FM
-            elif key == ord("/"):
+            elif key == ord("}"):
                 if self.datatype == "fmsongs":
                     if len(self.player.info["player_list"]) == 0:
                         continue
@@ -476,15 +478,15 @@ class Menu(object):
                     self.player.play_or_pause(self.player.info["idx"], isNotSongs)
 
             # 加载当前播放列表
-            elif key == ord("p"):
+            elif key == ord("l"):
                 self.show_playing_song()
 
             # 播放模式切换
-            elif key == ord("P"):
+            elif key == ord("M"):
                 self.player.change_mode()
 
             # 进入专辑
-            elif key == ord("A"):
+            elif key == ord("^"):
                 if datatype == "album":
                     continue
                 if datatype in ["songs", "fmsongs"]:
@@ -510,24 +512,8 @@ class Menu(object):
                             self.index = i
                             break
 
-            # 添加到打碟歌单
-            elif key == ord("a"):
-                if datatype == "songs" and len(datalist) != 0:
-                    self.djstack.append(datalist[idx])
-                elif datatype == "artists":
-                    pass
-
-            # 加载打碟歌单
-            elif key == ord("z"):
-                self.stack.append([datatype, title, datalist, offset, self.index])
-                self.datatype = "songs"
-                self.title = "网易云音乐 > 打碟"
-                self.datalist = self.djstack
-                self.offset = 0
-                self.index = 0
-
             # 添加到本地收藏
-            elif key == ord("s"):
+            elif key == ord("&"):
                 if (datatype == "songs" or datatype == "djchannels") and len(
                     datalist
                 ) != 0:
@@ -535,7 +521,7 @@ class Menu(object):
                     notify("Added successfully", 0)
 
             # 加载本地收藏
-            elif key == ord("c"):
+            elif key == ord("L"):
                 self.stack.append([datatype, title, datalist, offset, self.index])
                 self.datatype = "songs"
                 self.title = "网易云音乐 > 本地收藏"
@@ -554,6 +540,7 @@ class Menu(object):
                         offset, min(len(datalist), offset + step) - 1, idx
                     )
 
+            # 定时退出
             elif key == ord("t"):
                 self.countdown_start = time.time()
                 countdown = self.ui.build_timing()
@@ -571,7 +558,7 @@ class Menu(object):
                     self.is_in_countdown = False
 
             # 当前项目下移
-            elif key == ord("J"):
+            elif key == ord("S"):
                 if (
                     datatype != "main"
                     and len(datalist) != 0
@@ -586,7 +573,7 @@ class Menu(object):
                         self.offset = offset + step
 
             # 当前项目上移
-            elif key == ord("K"):
+            elif key == ord("W"):
                 if datatype != "main" and len(datalist) != 0 and idx != 0:
                     self.menu_starts = time.time()
                     song = self.datalist.pop(idx)
@@ -605,19 +592,20 @@ class Menu(object):
                     self.offset = 0
                     self.index = 0
 
-            elif key == ord("g"):
+            elif key == ord("h"):
                 if datatype == "help":
                     webbrowser.open_new_tab("https://github.com/darknessomi/musicbox")
-                else:
-                    self.index = 0
-                    self.offset = 0
 
-            elif key == ord("G"):
+            elif key == ord("("):
+                self.index = 0
+                self.offset = 0
+
+            elif key == ord(")"):
                 self.index = len(self.datalist) - 1
                 self.offset = self.index - self.index % step
 
             # 开始下载
-            elif key == ord("C"):
+            elif key == ord("D"):
                 s = self.datalist[idx]
                 cache_thread = threading.Thread(
                     target=self.player.cache_song,
@@ -625,7 +613,7 @@ class Menu(object):
                 )
                 cache_thread.start()
 
-            elif key == ord("i"):
+            elif key == ord("I"):
                 if self.player.playing_id != -1:
                     webbrowser.open_new_tab(
                         "http://music.163.com/song?id={}".format(self.player.playing_id)
@@ -909,3 +897,4 @@ class Menu(object):
             self.datatype = "help"
             self.title += " > 帮助"
             self.datalist = shortcut
+
