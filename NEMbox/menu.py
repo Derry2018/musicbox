@@ -390,7 +390,14 @@ class Menu(object):
             # 搜索
             elif key == ord("f"):
                 # 8 is the 'search' menu
-                self.dispatch_enter(8)
+                if datatype != "main":
+                    self.stack.append([datatype, title, datalist, offset, self.index])
+                    self.datatype = self.stack[0][0]
+                    self.title = self.stack[0][1]
+                    self.datalist = self.stack[0][2]
+                    self.offset = 0
+                    self.index = 0
+                self.dispatch_enter(9)
 
             # 播放下一曲
             elif key == ord("]"):
